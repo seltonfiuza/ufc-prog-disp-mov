@@ -2,5 +2,4 @@
 
 Aplicativo "vamos rachar" que calcula a divisão de um valor por número de pessoa
 
-## Video
-Não coloquei screenshots pois o video já mostra a tela
+Não coloquei screenshots pois o video *(Video.mp4)* já mostra a tela

@@ -1,16 +1,24 @@
 # trab_02
-
-A new Flutter project.
+5 contatos
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+O video é o arquivo
 
-A few resources to get you started if this is your first Flutter project:
+> video.mp4
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+No video não mostra, mas caso o usuario nao dê permissão, é inciado o app telefone com o numero preenchido
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+"""
+makeCall(phone) async {
+    if (await Permission.phone.request().isGranted) {
+        await FlutterPhoneDirectCaller.callNumber(phone);
+    } else {
+        launch('tel://${phone}');
+    }
+}
+
+"""
+
+### Adicionais
+Eu implementei cadastro de vários usuarios como adicional. e no video mostra eu saindo de um, entrando em outro e o usuario do primeiro persistindo.

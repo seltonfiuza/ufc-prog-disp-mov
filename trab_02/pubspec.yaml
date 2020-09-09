@@ -24,6 +24,13 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^0.5.10
+  permission_handler: ^5.0.1+1
+  flutter_contact: ^0.6.1
+  url_launcher: ^5.5.2
+  string_validator: ^0.1.4
+  flutter_phone_direct_caller:
+    git:
+      url: https://github.com/yanisalfian/flutter-phone-direct-caller.git
 
 
   # The following adds the Cupertino Icons font to your application.

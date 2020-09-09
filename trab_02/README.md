@@ -1,7 +1,6 @@
-# trab_02
-5 contatos
+# trab_02 - 5 contatos
 
-## Getting Started
+## 
 
 O video é o arquivo
 
@@ -9,16 +8,16 @@ O video é o arquivo
 
 No video não mostra, mas caso o usuario nao dê permissão, é inciado o app telefone com o numero preenchido
 
-"""
-makeCall(phone) async {
-    if (await Permission.phone.request().isGranted) {
-        await FlutterPhoneDirectCaller.callNumber(phone);
-    } else {
-        launch('tel://${phone}');
-    }
-}
 
-"""
+
+    makeCall(phone) async {
+        if (await Permission.phone.request().isGranted) {
+            await FlutterPhoneDirectCaller.callNumber(phone);
+        } else {
+            launch('tel://${phone}');
+        }
+    }
+
 
 ### Adicionais
-Eu implementei cadastro de vários usuarios como adicional. e no video mostra eu saindo de um, entrando em outro e o usuario do primeiro persistindo.
+Eu implementei cadastro de vários usuarios como adicional no video mostra eu saindo de um, entrando em outro e o usuario do primeiro persistindo.

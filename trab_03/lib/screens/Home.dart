@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trab_03/screens/BeforeCreate.dart';
 import 'package:trab_03/screens/Created.dart';
+import 'package:trab_03/screens/Joined.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -10,6 +11,15 @@ class HomePage extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => BeforeCreate(),
+        ),
+      );
+    }
+
+    joinGame(){
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => JoinedPage(),
         ),
       );
     }
@@ -44,7 +54,7 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 child: RaisedButton(
                   color: Colors.blue[700],
-                  onPressed: () => null,
+                  onPressed: () => joinGame(),
                   child: Text(
                     'Entrar em um jogo',
                     style: TextStyle(

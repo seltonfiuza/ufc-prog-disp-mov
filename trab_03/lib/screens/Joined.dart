@@ -12,13 +12,11 @@ class _JoinedPageState extends State<JoinedPage> {
   final portController = TextEditingController();
   final cepController = TextEditingController();
   final number2 = TextEditingController();
-  var ipAddress;
-  var port = 3000;
   int countPlayers, tentativas = 0;
   var connected = false;
   var isEnabled = true;
   var btnColor = Colors.lightBlue;
-  String logradouro, cidade, estado, pontuacao, status = '';
+  String logradouro, cidade, estado, pontuacao, status = '-';
   String msgEmbaixoDoBtn = '';
   final dio = Dio();
   var msg = '';
@@ -27,6 +25,7 @@ class _JoinedPageState extends State<JoinedPage> {
   var btnText = 'Entrar';
   IO.Socket socket;
   var btnTry = "Try";
+  var join = false;
 
   @override
   void dipose() {
@@ -37,53 +36,14 @@ class _JoinedPageState extends State<JoinedPage> {
 
   joinServer() {
     print('http://${this.ipController.text}:${this.portController.text}');
-    socket =
-        IO.io('http://${this.ipController.text}:${this.portController.text}');
-    // IO.io('http://${this.ipController.text}:${this.portController.text}');
-    print(socket);
-    socket.on('connect_error', (e) {
-      print(e);
-    });
-    socket.on('connect_timeout', (timeout) {
-      print('timeout, $timeout');
-    });
-    socket.on('error', (e) {
-      print(e);
-    });
-    socket.on('ping', (_) {
-      print('ping');
-    });
-    socket.on('connection', (_) {
-      print('connect1');
-      this.setState(() {
-        connected = true;
-      });
-    });
-    socket.on('connect', (_) {
-      print('connect');
-      this.setState(() {
-        connected = true;
-      });
-    });
-    socket.on(
-        'msg',
-        (data) => () {
-              print('iiiuiuiuiuiu');
-              print(data);
-              this.setState(() {
-                connected = true;
-              });
-              // var result = checkCep(data);
-              // socket.emit(result);
-              // if (result == 1) {
-              //   setState(() {
-              //     status = 'Perdeu :(';
-              //     btnTry = 'Você perdeu';
-              //   });
-              // }
-            });
-    socket.on('disconnect', (_) => print('disconnect'));
-    socket.on('fromServer', (_) => print(_));
+    if (!this.connected &&
+        this.ipController.text != null &&
+        this.portController != null) {
+      initSocket();
+      // setState(() {
+      //   join = true;
+      // });
+    }
   }
 
   checkCep(cep) {
@@ -99,8 +59,11 @@ class _JoinedPageState extends State<JoinedPage> {
   submit() async {
     var cep = number2.text + cepResto.replaceAll('-', '');
     try {
+      socket.emit(cep);
+      socket.emit('msg', cep);
       Response response =
           await dio.get('https://viacep.com.br/ws/${cep}/json/');
+
       print(response.data);
       var data = response.data;
       if (!data.containsKey('erro')) {
@@ -125,10 +88,45 @@ class _JoinedPageState extends State<JoinedPage> {
     }
   }
 
+  initSocket() {
+    this.socket =
+        IO.io('http://${this.ipController.text}:${this.portController.text}/');
+    this.socket.on('connect_error', (e) {
+      print('connection $e');
+    });
+    this.socket.on('connect_timeout', (timeout) {
+      print('timeout, $timeout');
+    });
+    this.socket.on('error', (e) {
+      print(e);
+    });
+    this.socket.on('connect', (_) {
+      print('connect');
+      this.setState(() {
+        connected = true;
+      });
+    });
+    this.socket.on(
+        'msg',
+        (data) => () {
+              print('iiiuiuiuiuiu');
+              print(data);
+              this.setState(() {
+                connected = true;
+              });
+            });
+    this.socket.on('disconnect', (_) => print('disconnect'));
+    this.socket.on('fromServer', (_) => print(_));
+  }
+
   @override
   Widget build(BuildContext context) {
+    // if (!this.join) {
+    //   this.initSocket();
+    // }
     return !this.connected
         ? Scaffold(
+            resizeToAvoidBottomPadding: false,
             body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -222,151 +220,155 @@ class _JoinedPageState extends State<JoinedPage> {
               ],
             ),
           )
-        : SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${this.ipAddress}:${this.port}",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.teal[800], fontSize: 36),
-                      ),
-                      Center(
-                        child: Text(
-                          "Players: ${this.countPlayers}",
+        : Scaffold(
+            resizeToAvoidBottomPadding: false,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20.0, left: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${this.ipController.text}:${this.portController.text}",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.lightBlue[700],
+                          style:
+                              TextStyle(color: Colors.teal[800], fontSize: 36),
+                        ),
+                        Center(
+                          child: Text(
+                            "Players: ${this.countPlayers}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.lightBlue[700],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 200,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 50,
-                            width: 70,
-                            color: Colors.lightBlue[300],
-                            child: Center(
-                              child: TextField(
-                                controller: this.number2,
-                                // maxLength: 3,
-                                textAlign: TextAlign.center,
-                                textAlignVertical: TextAlignVertical.center,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 32.0,
-                                    fontWeight: FontWeight.bold),
-                                autocorrect: true,
-                                keyboardType: TextInputType.number,
+                        SizedBox(
+                          height: 200,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 50,
+                              width: 70,
+                              color: Colors.lightBlue[300],
+                              child: Center(
+                                child: TextField(
+                                  controller: this.number2,
+                                  // maxLength: 3,
+                                  textAlign: TextAlign.center,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 32.0,
+                                      fontWeight: FontWeight.bold),
+                                  autocorrect: true,
+                                  keyboardType: TextInputType.number,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            child: Text(
-                              this.cepResto,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 32.0,
-                                  color: Colors.black87),
+                            SizedBox(
+                              width: 10,
                             ),
+                            Container(
+                              child: Text(
+                                this.cepResto,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 32.0,
+                                    color: Colors.black87),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.0),
+                    Center(
+                      child: RaisedButton(
+                        onPressed: () => this.submit(),
+                        color: Colors.lightBlue,
+                        child: Text(
+                          this.btnTry,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32.0,
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.0),
-                  Center(
-                    child: RaisedButton(
-                      onPressed: () => this.submit(),
-                      color: Colors.lightBlue,
-                      child: Text(
-                        this.btnTry,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 32.0,
                         ),
                       ),
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      this.msg,
-                      style: TextStyle(color: Colors.red[400]),
-                    ),
-                  ),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        // left: 40.0,
-                        top: 40.0,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Logradouro: ${this.logradouro}',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0),
-                          ),
-                          Text(
-                            'Cidade: ${this.cidade}',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0),
-                          ),
-                          Text(
-                            'Estado: ${this.estado}',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0),
-                          ),
-                          SizedBox(height: 10.0),
-                          Text(
-                            'Status: ${this.status}',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0),
-                          ),
-                          // Text(
-                          //   'Pontuação: ${this.pontuacao}',
-                          //   style: TextStyle(
-                          //       color: Colors.black87,
-                          //       fontWeight: FontWeight.bold,
-                          //       fontSize: 18.0),
-                          // ),
-                          Text(
-                            'Tentativas: ${this.tentativas.toString()}',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0),
-                          ),
-                        ],
+                    Center(
+                      child: Text(
+                        this.msg,
+                        style: TextStyle(color: Colors.red[400]),
                       ),
                     ),
-                  )
-                ],
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          // left: 40.0,
+                          top: 40.0,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Logradouro: ${this.logradouro}',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0),
+                            ),
+                            Text(
+                              'Cidade: ${this.cidade}',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0),
+                            ),
+                            Text(
+                              'Estado: ${this.estado}',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0),
+                            ),
+                            SizedBox(height: 10.0),
+                            Text(
+                              'Status: ${this.status}',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0),
+                            ),
+                            // Text(
+                            //   'Pontuação: ${this.pontuacao}',
+                            //   style: TextStyle(
+                            //       color: Colors.black87,
+                            //       fontWeight: FontWeight.bold,
+                            //       fontSize: 18.0),
+                            // ),
+                            Text(
+                              'Tentativas: ${this.tentativas.toString()}',
+                              style: TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trab_03/screens/BeforeCreate.dart';
-import 'package:trab_03/screens/Created.dart';
 import 'package:trab_03/screens/Joined.dart';
+import 'package:trab_03/screens/Server.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -10,12 +10,12 @@ class HomePage extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BeforeCreate(),
+          builder: (context) => SocketServer(),
         ),
       );
     }
 
-    joinGame(){
+    joinGame() {
       Navigator.push(
         context,
         MaterialPageRoute(

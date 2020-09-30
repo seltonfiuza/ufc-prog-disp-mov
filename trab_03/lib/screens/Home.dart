@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trab_03/screens/BeforeCreate.dart';
+import 'package:trab_03/screens/Client.dart';
 import 'package:trab_03/screens/Joined.dart';
 import 'package:trab_03/screens/Server.dart';
 
@@ -19,7 +20,7 @@ class HomePage extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => JoinedPage(),
+          builder: (context) => SocketClient(),
         ),
       );
     }
